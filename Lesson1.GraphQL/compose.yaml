@@ -1,0 +1,6 @@
+﻿services:
+  lesson1.graphql:
+    image: lesson1.graphql
+    build:
+      context: .
+      dockerfile: Lesson1.GraphQL/Dockerfile
