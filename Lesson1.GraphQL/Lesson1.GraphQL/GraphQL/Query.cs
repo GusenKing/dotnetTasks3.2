@@ -2,7 +2,7 @@ using Lesson1.GraphQL.Entities;
 
 namespace Lesson1.GraphQL.GraphQL;
 
-public class PeopleQuery
+public class Query
 {
     [UsePaging]
     [UseProjection]

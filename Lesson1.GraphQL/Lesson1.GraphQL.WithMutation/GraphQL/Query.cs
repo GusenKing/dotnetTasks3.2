@@ -1,5 +1,4 @@
 using System.Reflection;
-using HotChocolate.Data;
 using Lesson1.GraphQL.WithMutation.Entities;
 using Microsoft.Extensions.Caching.Memory;
 

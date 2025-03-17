@@ -16,5 +16,6 @@ app.UseHttpsRedirection();
 
 app.UseWebSockets();
 app.MapGraphQL();
+app.RunWithGraphQLCommands(args);
 
 app.Run();
