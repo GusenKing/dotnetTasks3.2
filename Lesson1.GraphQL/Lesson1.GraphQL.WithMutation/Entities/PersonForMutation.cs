@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Lesson1.GraphQL.Entities;
+namespace Lesson1.GraphQL.WithMutation.Entities;
 
-public class Person
+public class PersonForMutation
 {
     [Key] public Guid Id { get; set; }
     [Required] public string Name { get; set; }
