@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option csharp_namespace = "Lesson2.Grpc";
+
+import "google/protobuf/timestamp.proto";
+
+package service1;
+
+service WeatherService {
+  rpc StreamingFromServer (WeatherStreamRequest) returns (stream WeatherStreamResponse);
+}
+
+message WeatherStreamRequest {
+  google.protobuf.Timestamp currentTime = 1;
+}
+
+message WeatherStreamResponse {
+  float weatherValue = 1;
+  string weatherUnits = 2;
+  google.protobuf.Timestamp time = 3;
+  
+}
