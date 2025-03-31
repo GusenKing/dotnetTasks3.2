@@ -4,5 +4,5 @@ namespace Task1.Server.Services.Abstractions;
 
 public interface IWeatherApiCallingService
 {
-    public Task<WeatherInfoDto?> GetWeatherForecastAsync();
+    public Task<WeatherInfoDto?> GetWeatherForecastAsync(DateTimeOffset currentTime);
 }

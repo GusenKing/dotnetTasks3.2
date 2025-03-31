@@ -11,17 +11,17 @@ public class OpenMeteoApiCallingService(ILogger<OpenMeteoApiCallingService> logg
     private const double KazanLongitude = 49.07;
 
     private readonly string _currentWeatherApiUrl =
-        "https://api.open-meteo.com/v1/forecast?current=temperature_2m&timezone=Europe/Moscow";
+        "https://api.open-meteo.com/v1/forecast?timezone=Europe/Moscow&hourly=temperature_2m";
 
     private readonly HttpController _httpController = new();
 
-    public async Task<WeatherInfoDto?> GetWeatherForecastAsync()
+    public async Task<WeatherInfoDto?> GetWeatherForecastAsync(DateTimeOffset currentTime)
     {
         try
         {
             var response =
                 await _httpController.Client.GetAsync(
-                    $"{_currentWeatherApiUrl}&latitude={KazanLatitude}&longitude={KazanLongitude}");
+                    $"{_currentWeatherApiUrl}&latitude={KazanLatitude}&longitude={KazanLongitude}&start_hour={currentTime:s}&end_hour={currentTime:s}");
             response.EnsureSuccessStatusCode();
 
             var weatherForecast = await JsonSerializer.DeserializeAsync<WeatherForSpecificTimeDto>(
@@ -30,8 +30,9 @@ public class OpenMeteoApiCallingService(ILogger<OpenMeteoApiCallingService> logg
 
             var necessaryWeatherInfo = new WeatherInfoDto
             {
-                Temperature = weatherForecast?.Current?.Temperature,
-                TemperatureUnit = weatherForecast?.CurrentUnits?.Temperature, Time = weatherForecast?.Current?.Time
+                Temperature = weatherForecast!.Hourly!.Temperature[0],
+                TemperatureUnit = weatherForecast.HourlyUnits?.Temperature[0],
+                Time = DateTimeOffset.Parse(weatherForecast.Hourly?.Time[0]!)
             };
 
             return necessaryWeatherInfo;
