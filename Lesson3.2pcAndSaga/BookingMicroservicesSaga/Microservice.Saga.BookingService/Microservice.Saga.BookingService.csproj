@@ -26,12 +26,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\Microservice.Saga.Contracts\Microservice.Saga.Contracts.csproj" />
     </ItemGroup>
 
