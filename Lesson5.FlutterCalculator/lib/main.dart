@@ -139,7 +139,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
               Padding(padding: const EdgeInsets.only(top: 24)),
-              Text("= $result", style: TextStyle(fontSize: 24)),
+              Text(
+                result == "" ? "" : "= $result",
+                style: TextStyle(fontSize: 24),
+              ),
             ],
           ),
         ),
