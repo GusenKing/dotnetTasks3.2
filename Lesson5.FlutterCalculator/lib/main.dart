@@ -33,7 +33,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   double firstNumber = 0;
   double secondNumber = 0;
-  String result = "";
+  double calculationResult = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     Theme.of(context).colorScheme.secondary,
                     () => setState(() {
                       var tempResult = firstNumber + secondNumber;
-                      result = tempResult.toString();
+                      calculationResult = tempResult;
                     }),
                   ),
                   calculatorOperationButton(
@@ -87,7 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     Theme.of(context).colorScheme.secondary,
                     () => setState(() {
                       var tempResult = firstNumber - secondNumber;
-                      result = tempResult.toString();
+                      calculationResult = tempResult;
                     }),
                   ),
                 ],
@@ -100,7 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     Theme.of(context).colorScheme.secondary,
                     () => setState(() {
                       var tempResult = firstNumber * secondNumber;
-                      result = tempResult.toString();
+                      calculationResult = tempResult;
                     }),
                   ),
                   calculatorOperationButton(
@@ -133,16 +133,17 @@ class _MyHomePageState extends State<MyHomePage> {
                         return;
                       }
                       var tempResult = firstNumber / secondNumber;
-                      result = tempResult.toString();
+                      calculationResult = tempResult;
                     }),
                   ),
                 ],
               ),
               Padding(padding: const EdgeInsets.only(top: 24)),
               Text(
-                result == "" ? "" : "= $result",
+                calculationResult.toString(),
                 style: TextStyle(fontSize: 24),
               ),
+              Divider(thickness: 1, color: Colors.grey),
             ],
           ),
         ),
