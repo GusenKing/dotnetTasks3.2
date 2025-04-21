@@ -78,16 +78,14 @@ class _MyHomePageState extends State<MyHomePage> {
                     "+",
                     Theme.of(context).colorScheme.secondary,
                     () => setState(() {
-                      var tempResult = firstNumber + secondNumber;
-                      calculationResult = tempResult;
+                      calculationResult = firstNumber + secondNumber;
                     }),
                   ),
                   calculatorOperationButton(
                     "-",
                     Theme.of(context).colorScheme.secondary,
                     () => setState(() {
-                      var tempResult = firstNumber - secondNumber;
-                      calculationResult = tempResult;
+                      calculationResult = firstNumber - secondNumber;
                     }),
                   ),
                 ],
@@ -99,8 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     "x",
                     Theme.of(context).colorScheme.secondary,
                     () => setState(() {
-                      var tempResult = firstNumber * secondNumber;
-                      calculationResult = tempResult;
+                      calculationResult = firstNumber * secondNumber;
                     }),
                   ),
                   calculatorOperationButton(
@@ -132,8 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         );
                         return;
                       }
-                      var tempResult = firstNumber / secondNumber;
-                      calculationResult = tempResult;
+                      calculationResult = firstNumber / secondNumber;
                     }),
                   ),
                 ],
