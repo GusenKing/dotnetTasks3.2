@@ -2,10 +2,10 @@ import 'package:dio/dio.dart';
 import '../../domain/models/post.dart';
 import '../../domain/repositories/post_repository.dart';
 
-class PostRepositoryImpl implements PostRepository {
+class PostRepositoryImplementation implements PostRepository {
   final Dio dio;
 
-  PostRepositoryImpl({required this.dio});
+  PostRepositoryImplementation({required this.dio});
 
   @override
   Future<Post> getPost() async {

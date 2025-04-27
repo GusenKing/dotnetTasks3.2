@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:lesson7_clean_architecture/core/di/service_locator.dart';
 import '../viewmodels/single_post_viewmodel.dart';
 import '../../domain/models/post.dart';
 
 class SinglePostPage extends StatefulWidget {
-  final SinglePostViewModel viewModel;
-
-  const SinglePostPage({super.key, required this.viewModel});
+  const SinglePostPage({super.key});
 
   @override
   _SinglePostPageState createState() => _SinglePostPageState();
 }
 
 class _SinglePostPageState extends State<SinglePostPage> {
+  late final SinglePostViewModel viewModel;
+
   Post? post;
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    widget.viewModel.fetchPost().then((value) {
+    viewModel = serviceLocator<SinglePostViewModel>();
+    viewModel.fetchPost().then((value) {
       setState(() {
         post = value;
         isLoading = false;
@@ -35,7 +37,19 @@ class _SinglePostPageState extends State<SinglePostPage> {
               ? Center(child: CircularProgressIndicator())
               : Padding(
                 padding: EdgeInsets.all(16),
-                child: Text(post?.body ?? 'No data'),
+                child: Column(
+                  children: [
+                    Text(
+                      post?.title ?? 'No data',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text(post?.body ?? 'No data', textAlign: TextAlign.left),
+                  ],
+                ),
               ),
     );
   }
