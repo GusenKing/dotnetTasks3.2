@@ -12,7 +12,7 @@ public class UpdatePublisher(ILogger<UpdatePublisher> logger, IBus bus) : Backgr
             var message = "Hello at " + DateTime.UtcNow;
             await bus.Publish(new UpdateMessage(message), stoppingToken);
             logger.LogInformation("Published {message}", message);
-            await Task.Delay(1000, stoppingToken);
+            await Task.Delay(5000, stoppingToken);
         }
     }
 }

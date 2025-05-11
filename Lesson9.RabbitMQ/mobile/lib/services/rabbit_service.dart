@@ -1,62 +1,55 @@
+import 'dart:async';
 import 'package:dart_amqp/dart_amqp.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class RabbitService {
-  late Client client;
-  late Channel channel;
-  late String sessionKey = 'session_id';
-  late String usernameKey = 'username';
+  final String host;
+  final int port;
+  final String username;
+  final String password;
+  late Client _client;
+  late Channel _channel;
+  late Queue _queue;
+  final StreamController<String> _controller = StreamController.broadcast();
 
-  Future<void> connect() async {
-    client = Client(settings: ConnectionSettings(host: 'localhost'));
-    channel = await client.channel();
-  }
+  Stream<String> get messages => _controller.stream;
 
-  Future<Guid?> loadSession() async {
-    final prefs = await SharedPreferences.getInstance();
-    final sid = prefs.getString(sessionKey);
-    if (sid != null) return Guid.parse(sid);
-    return null;
-  }
+  RabbitService({
+    this.host = '10.0.2.2',
+    this.port = 5672,
+    this.username = 'guest',
+    this.password = 'guest',
+  });
 
-  Future<bool> validateSession(Guid sessionId) async {
-    final rpcClient = channel.rpc();
-    final resp = await rpcClient
-        .wrap('validate-service')
-        .request(ValidateRequest(sessionId));
-    return resp.valid;
-  }
+  Future<void> connectAndSubscribe({
+    String exchangeName = 'Lesson9.Backend.Contracts:UpdateMessage',
+    String queueName = '',
+  }) async {
+    var settings = ConnectionSettings(
+      host: host,
+      port: port,
+      authProvider: PlainAuthenticator(username, password),
+      virtualHost: '/',
+    );
 
-  Future<Guid?> login(String username) async {
-    final rpcClient = channel.rpc();
-    final req = LoginRequest(username, Guid.newGuid());
-    final resp = await rpcClient.wrap('login-service').request(req);
-    if (resp.success) {
-      final prefs = await SharedPreferences.getInstance();
-      prefs.setString(usernameKey, username);
-      prefs.setString(sessionKey, resp.sessionId.toString());
-      _subscribeKickOut(resp.sessionId);
-      _subscribeUpdates(resp.sessionId);
-      return resp.sessionId;
-    }
-    return null;
-  }
+    _client = Client(settings: settings);
+    _channel = await _client.channel();
+    var exchange = await _channel.exchange(
+      exchangeName,
+      ExchangeType.FANOUT,
+      durable: true,
+    );
 
-  void _subscribeKickOut(Guid sessionId) async {
-    final queue = await channel.queue('kickout.\${sessionId}', durable: false);
-    queue.consume((msg) {
-      // обрабатывать выход: удалить prefs и перейти на экран логина
+    _queue = await _channel.queue(queueName, durable: true, autoDelete: true);
+    await _queue.bind(exchange, "");
+    var queueConsumer = await _queue.consume(noAck: true);
+
+    queueConsumer.listen((AmqpMessage msg) {
+      _controller.add(msg.payloadAsJson["message"]["payload"]);
     });
   }
 
-  void _subscribeUpdates(Guid sessionId) async {
-    // фан-аут топик 'updates'
-    final exchange = await channel.exchange('updates', ExchangeType.FANOUT);
-    final q = await channel.queue('', exclusive: true);
-    await q.bind(exchange, '');
-    q.consume((msg) {
-      print('Получено сообщение: \${msg.payload}');
-      // обновить UI
-    });
+  Future<void> disconnect() async {
+    await _controller.close();
+    await _client.close();
   }
 }
