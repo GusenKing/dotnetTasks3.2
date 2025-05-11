@@ -1,19 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/pages/home_page.dart';
-import 'services/rabbit_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'pages/login_page.dart';
+import 'pages/home_page.dart';
+import 'services/auth_service.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  runApp(ProviderScope(child: MyApp()));
+}
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-
+class MyApp extends ConsumerStatefulWidget {
   @override
   _MyAppState createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends ConsumerState<MyApp> {
+  bool _initialized = false;
+  @override
+  void initState() {
+    super.initState();
+    _initAuth();
+  }
+
+  Future<void> _initAuth() async {
+    final ok = await ref.read(authServiceProvider).tryAutoLogin();
+    setState(() => _initialized = true);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: Scaffold(body: HomePage()));
+    if (!_initialized) {
+      return const MaterialApp(
+        home: Scaffold(body: Center(child: CircularProgressIndicator())),
+      );
+    }
+    final user = ref.watch(userProvider);
+    return MaterialApp(home: user == null ? LoginPage() : HomePage());
   }
 }

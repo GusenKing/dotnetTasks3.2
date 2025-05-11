@@ -10,7 +10,7 @@ public class UpdatePublisher(ILogger<UpdatePublisher> logger, IBus bus) : Backgr
         while (!stoppingToken.IsCancellationRequested)
         {
             var message = "Hello at " + DateTime.UtcNow;
-            await bus.Publish(new UpdateMessage(message), stoppingToken);
+            await bus.Publish(new UserNotification(message), stoppingToken);
             logger.LogInformation("Published {message}", message);
             await Task.Delay(5000, stoppingToken);
         }

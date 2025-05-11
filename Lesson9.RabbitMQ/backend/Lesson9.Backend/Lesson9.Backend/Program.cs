@@ -1,37 +1,68 @@
-using System.Collections.Concurrent;
+using System.Text;
+using Lesson9.Backend.Contracts;
 using Lesson9.Backend.Services.BackgroundServices;
-using Lesson9.Backend.Services.Consumers;
+using Lesson9.Backend.Services.InMemorySessionStore;
 using MassTransit;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using RabbitMQ.Client;
 
-var builder = Host.CreateApplicationBuilder(args);
-builder.Services.AddSingleton(new ConcurrentDictionary<string, Guid>());
+var builder = WebApplication.CreateBuilder(args);
 
-var rabbitSettings = builder.Configuration.GetSection("RabbitMQ");
-builder.Services.AddMassTransit(x =>
+var jwtKey = builder.Configuration["Jwt:Key"];
+var keyBytes = Encoding.UTF8.GetBytes(jwtKey!);
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        x.AddConsumer<LoginConsumer>();
-        x.AddConsumer<ValidateConsumer>();
-
-        x.UsingRabbitMq((ctx, cfg) =>
+        options.TokenValidationParameters = new TokenValidationParameters
         {
-            cfg.Host(rabbitSettings["Host"], rabbitSettings["VHost"], hostConfigurator =>
-            {
-                hostConfigurator.Username(rabbitSettings["Username"]!);
-                hostConfigurator.Password(rabbitSettings["Password"]!);
-            });
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
 
-            cfg.ReceiveEndpoint("login-service",
-                endpointConfigurator => endpointConfigurator.ConfigureConsumer<LoginConsumer>(ctx));
-            cfg.ReceiveEndpoint("validate-service",
-                endpointConfigurator => endpointConfigurator.ConfigureConsumer<ValidateConsumer>(ctx));
+
+builder.Services.AddSingleton<ISessionStore, InMemorySessionStore>();
+
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        var mq = builder.Configuration.GetSection("RabbitMq");
+        cfg.Host(mq["Host"], h =>
+        {
+            h.Username(mq["Username"]!);
+            h.Password(mq["Password"]!);
         });
 
-        x.AddPublishMessageScheduler();
-    }
-);
+        cfg.Message<LogoutRequested>(m => m.SetEntityName("logout_exchange"));
+        cfg.Publish<LogoutRequested>(p =>
+        {
+            p.ExchangeType = ExchangeType.Topic;
+            p.Durable = true;
+            p.AutoDelete = false;
+        });
+
+        cfg.Message<UserNotification>(m => m.SetEntityName("backend_exchange"));
+        cfg.Publish<UserNotification>(p =>
+        {
+            p.ExchangeType = ExchangeType.Fanout;
+            p.Durable = true;
+            p.AutoDelete = false;
+        });
+    });
+});
 
 builder.Services.AddHostedService<UpdatePublisher>();
 
+builder.Services.AddControllers();
+var app = builder.Build();
 
-var host = builder.Build();
-host.Run();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
+app.Run();
