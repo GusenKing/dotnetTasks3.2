@@ -1,6 +1,9 @@
 structurizr/.structurizr
 Lesson5HW/rabbitmq
 
+Lesson11.ClickHouse/data
+Lesson11.ClickHouse/logs
+
 .idea
 .vscode
 *.http
