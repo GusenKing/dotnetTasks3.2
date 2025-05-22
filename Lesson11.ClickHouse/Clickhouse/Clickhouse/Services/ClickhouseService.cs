@@ -4,17 +4,12 @@ using Clickhouse.Models;
 
 namespace Clickhouse.Services;
 
-public class ClickhouseService(IConfiguration config)
+public class ClickhouseService(IConfiguration config) : IClickhouseWrapper, IUsersRepository
 {
     private const string TableName = "Users";
 
     private readonly string _connectionString =
-        $"Host=localhost;Protocol=https;Port=8443;Username={config["Clickhouse:User"]};Password={config["Clickhouse:Password"]}";
-
-    private ClickHouseConnection GetConnection()
-    {
-        return new ClickHouseConnection(_connectionString);
-    }
+        $"Host=localhost;Protocol=http;Username={config["Clickhouse:User"]};Password={config["Clickhouse:Password"]}";
 
     public async Task CreateTableIfNotExistAsync()
     {
@@ -55,10 +50,10 @@ public class ClickhouseService(IConfiguration config)
         await using var command = connection.CreateCommand();
 
         command.CommandText = sql;
-        command.AddParameter("id", user.Id);
-        command.AddParameter("name", user.Name);
-        command.AddParameter("age", user.Age);
-        command.AddParameter("totalSpending", user.TotalSpending);
+        command.AddParameter("id", "UInt32", user.Id);
+        command.AddParameter("name", "String", user.Name);
+        command.AddParameter("age", "UInt16", user.Age);
+        command.AddParameter("totalSpending", "Decimal", user.TotalSpending);
 
         return await command.ExecuteNonQueryAsync();
     }
@@ -74,9 +69,30 @@ public class ClickhouseService(IConfiguration config)
         await command.ExecuteNonQueryAsync();
     }
 
+    public async Task<List<User>> GetAllAsync()
+    {
+        const string sql = $"SELECT Id, Name, Age, TotalSpending FROM {TableName}";
+        await using var connection = GetConnection();
+        await connection.OpenAsync();
+        await using var command = connection.CreateCommand();
+        command.CommandText = sql;
+
+        await using var reader = await command.ExecuteReaderAsync();
+        var results = new List<User>();
+        while (await reader.ReadAsync())
+            results.Add(new User
+            {
+                Id = (uint)reader.GetValue(0),
+                Name = reader.GetString(1),
+                Age = (ushort)reader.GetValue(2),
+                TotalSpending = reader.GetDecimal(3)
+            });
+        return results;
+    }
+
     public async Task<List<User>> SearchByNameAsync(string name)
     {
-        const string sql = $"SELECT Id, Name, Age FROM {TableName} WHERE Name = {{name:String}}";
+        const string sql = $"SELECT Id, Name, Age, TotalSpending FROM {TableName} WHERE Name = {{name:String}}";
         await using var connection = GetConnection();
         await connection.OpenAsync();
         await using var command = connection.CreateCommand();
@@ -96,13 +112,15 @@ public class ClickhouseService(IConfiguration config)
         return results;
     }
 
-    public async Task<List<User>> SearchWithConditionsAsync(
+
+    public async Task<List<User>> SearchByNameAndOrAgeAsync(
         string name,
-        byte age,
+        ushort age,
         bool useAnd = true)
     {
         var op = useAnd ? "AND" : "OR";
-        var sql = $"SELECT Id, Name, Age FROM {TableName} WHERE Name = {{name:String}} {op} Age = {{age:UInt16}}";
+        var sql =
+            $"SELECT Id, Name, Age, TotalSpending FROM {TableName} WHERE Name = {{name:String}} {op} Age = {{age:UInt16}}";
         await using var connection = GetConnection();
         await connection.OpenAsync();
         await using var command = connection.CreateCommand();
@@ -121,5 +139,10 @@ public class ClickhouseService(IConfiguration config)
                 TotalSpending = reader.GetDecimal(3)
             });
         return results;
+    }
+
+    private ClickHouseConnection GetConnection()
+    {
+        return new ClickHouseConnection(_connectionString);
     }
 }
