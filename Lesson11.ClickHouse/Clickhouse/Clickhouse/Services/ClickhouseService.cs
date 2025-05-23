@@ -13,16 +13,8 @@ public class ClickhouseService(IConfiguration config) : IClickhouseWrapper, IUse
 
     public async Task CreateTableIfNotExistAsync()
     {
-        const string sql = $"""
-
-                                        CREATE TABLE IF NOT EXISTS {TableName} (
-                                            Id UInt32,
-                                            Name String,
-                                            Age UInt16,
-                                            TotalSpending Decimal,
-                                        ) ENGINE = MergeTree()
-                                        ORDER BY Id
-                            """;
+        const string sql =
+            $"CREATE TABLE IF NOT EXISTS {TableName} (Id UInt32, Name String, Age UInt16, TotalSpending Decimal) ENGINE = MergeTree() ORDER BY Id";
 
         await using var connection = GetConnection();
         await connection.OpenAsync();
@@ -44,16 +36,16 @@ public class ClickhouseService(IConfiguration config) : IClickhouseWrapper, IUse
     public async Task<int> InsertAsync(User user)
     {
         const string sql =
-            $"INSERT INTO {TableName} (Id, Name, Age, TotalSpending) VALUES ({{id:UInt32, name:String, age:UInt16, totalSpending:Decimal}})";
+            $"INSERT INTO {TableName} (Id, Name, Age, TotalSpending) VALUES ({{id:UInt32}}, {{name:String}}, {{age:UInt16}}, {{totalSpending:Decimal}})";
         await using var connection = GetConnection();
         await connection.OpenAsync();
         await using var command = connection.CreateCommand();
 
-        command.CommandText = sql;
         command.AddParameter("id", "UInt32", user.Id);
         command.AddParameter("name", "String", user.Name);
         command.AddParameter("age", "UInt16", user.Age);
         command.AddParameter("totalSpending", "Decimal", user.TotalSpending);
+        command.CommandText = sql;
 
         return await command.ExecuteNonQueryAsync();
     }
