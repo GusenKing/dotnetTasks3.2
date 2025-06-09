@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lesson13.Elasticsearch", "Lesson13.Elasticsearch\Lesson13.Elasticsearch.csproj", "{89DE7E37-246C-49B3-B06B-BDE56A16D62B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "compose", "compose", "{777771E9-5892-4ED6-B118-240464B012DE}"
+	ProjectSection(SolutionItems) = preProject
+		..\compose.yaml = ..\compose.yaml
+		..\.env = ..\.env
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{89DE7E37-246C-49B3-B06B-BDE56A16D62B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89DE7E37-246C-49B3-B06B-BDE56A16D62B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89DE7E37-246C-49B3-B06B-BDE56A16D62B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89DE7E37-246C-49B3-B06B-BDE56A16D62B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
