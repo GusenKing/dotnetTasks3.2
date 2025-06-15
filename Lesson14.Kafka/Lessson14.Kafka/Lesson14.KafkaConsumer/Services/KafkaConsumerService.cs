@@ -20,7 +20,7 @@ public class KafkaConsumerService(ILogger<KafkaConsumerService> logger, IConfigu
         _consumer.Subscribe(configuration["Kafka:TopicName"]);
         try
         {
-            while (true)
+            while (!stoppingToken.IsCancellationRequested)
             {
                 var consumeResult = _consumer.Consume(stoppingToken);
                 logger.LogInformation("Consumed message: {MessageValue}", consumeResult.Message.Value);

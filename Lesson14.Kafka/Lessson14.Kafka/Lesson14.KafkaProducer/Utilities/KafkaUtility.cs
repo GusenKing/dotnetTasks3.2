@@ -19,7 +19,13 @@ public static class KafkaUtility
                 {
                     Name = topicName,
                     ReplicationFactor = 1,
-                    NumPartitions = 1
+                    NumPartitions = 1,
+                    Configs = new Dictionary<string, string>
+                    {
+                        { "retention.ms", "6000" },
+                        { "segment.ms", "7000" },
+                        { "cleanup.policy", "delete" }
+                    }
                 }
             ]);
         }
