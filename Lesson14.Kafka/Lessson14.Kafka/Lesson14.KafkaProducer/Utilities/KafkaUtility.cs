@@ -23,7 +23,8 @@ public static class KafkaUtility
                     Configs = new Dictionary<string, string>
                     {
                         { "retention.ms", "6000" },
-                        { "segment.ms", "7000" },
+                        { "segment.ms", "5000" },
+                        { "segment.bytes", "100" },
                         { "cleanup.policy", "delete" }
                     }
                 }
