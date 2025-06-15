@@ -15,7 +15,8 @@ public class PeriodicHostedService(
         while (
             !stoppingToken.IsCancellationRequested &&
             await timer.WaitForNextTickAsync(stoppingToken))
-            await producerService.SendMessageAsync(configuration["Kafka:TopicName"]!,
-                DateTime.Now.ToString(CultureInfo.InvariantCulture));
+            for (var i = 0; i < 3; i++)
+                await producerService.SendMessageAsync(configuration["Kafka:TopicName"]!,
+                    $"Message {i + 1}: {DateTime.Now.ToString(CultureInfo.InvariantCulture)}");
     }
 }
