@@ -1,0 +1,21 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "compose", "compose", "{578CBA6A-1B0E-4061-8524-2DE633A7E582}"
+	ProjectSection(SolutionItems) = preProject
+		..\compose.yaml = ..\compose.yaml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lesson14.KafkaProducer", "Lesson14.KafkaProducer\Lesson14.KafkaProducer.csproj", "{ECC53C96-A5A6-429C-B244-5F97F7905792}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ECC53C96-A5A6-429C-B244-5F97F7905792}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECC53C96-A5A6-429C-B244-5F97F7905792}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECC53C96-A5A6-429C-B244-5F97F7905792}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECC53C96-A5A6-429C-B244-5F97F7905792}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
